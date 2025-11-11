@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lịch Sử Vật Liệu & Kinh Tế Thế Giới — Tổng Quan + Chi Tiết + Timeline</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg,#667eea 0%, #764ba2 100%); min-height: 100vh; color: #333; }
+
+    /* Header */
+    header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,.1); position: sticky; top: 0; z-index: 1000; }
+    nav { max-width: 1200px; margin: 0 auto; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 24px; font-weight: bold; background: linear-gradient(135deg,#667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .nav-links { display: flex; gap: 30px; list-style: none; }
+    .nav-links a { text-decoration: none; color: #333; font-weight: 500; transition: all .3s; padding: 8px 16px; border-radius: 8px; }
+    .nav-links a:hover, .nav-links a.active { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: white; }
+
+    /* Container */
+    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
+
+    /* Page switcher */
+    .page { display: none; animation: fadeIn .5s; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px);} to { opacity: 1; transform: translateY(0);} }
+
+    /* Intro (Page 1) */
+    .intro-section { background: white; border-radius: 20px; padding: 40px; margin-bottom: 30px; box-shadow: 0 10px 40px rgba(0,0,0,.1); }
+    .intro-section h1 { font-size: 42px; margin-bottom: 20px; color: #667eea; text-align: center; }
+    .intro-section p { font-size: 18px; line-height: 1.8; color: #555; text-align: center; margin-bottom: 30px; }
+
+    .materials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-top: 40px; }
+    .material-card { background: linear-gradient(135deg,#f5f7fa 0%, #c3cfe2 100%); border-radius: 15px; padding: 30px; transition: all .3s; cursor: pointer; position: relative; overflow: hidden; }
+    .material-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg,#667eea, #764ba2); }
+    .material-card:hover { transform: translateY(-10px); box-shadow: 0 15px 40px rgba(102,126,234,.3); }
+    .material-card h3 { font-size: 24px; margin-bottom: 10px; color: #667eea; }
+    .material-period { font-size: 14px; color: #666; margin-bottom: 15px; font-weight: 600; }
+    .material-card p { font-size: 15px; line-height: 1.6; color: #444; }
+    .impact-badge { display: inline-block; background: #667eea; color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; margin-top: 10px; }
+
+    /* Detail (Page 2) */
+    .detail-container { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,.1); }
+    .stage-selector { background: #667eea; padding: 20px; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+    .stage-btn { background: rgba(255,255,255,.2); color: white; border: 2px solid rgba(255,255,255,.3); padding: 12px 25px; border-radius: 25px; cursor: pointer; transition: all .3s; font-size: 14px; font-weight: 600; }
+    .stage-btn:hover, .stage-btn.active { background: white; color: #667eea; border-color: white; }
+    .split-view { display: grid; grid-template-columns: 1fr 1fr; min-height: 600px; }
+    .info-panel { padding: 40px; overflow-y: auto; max-height: 600px; }
+    .info-panel h2 { font-size: 32px; color: #667eea; margin-bottom: 15px; }
+    .info-panel h3 { font-size: 20px; color: #764ba2; margin-top: 25px; margin-bottom: 10px; }
+    .info-panel p, .info-panel ul { font-size: 16px; line-height: 1.8; color: #555; margin-bottom: 15px; }
+    .info-panel ul { padding-left: 25px; }
+    .info-panel li { margin-bottom: 10px; }
+    .video-panel { background: #000; display: flex; align-items: center; justify-content: center; position: relative; }
+    .video-panel iframe { width: 100%; height: 100%; border: none; }
+    .video-placeholder { text-align: center; color: #999; padding: 40px; }
+    .video-placeholder svg { width: 80px; height: 80px; margin-bottom: 20px; opacity: .5; }
+    .stage-content { display: none; }
+    .stage-content.active { display: block; }
+
+    /* ===== Timeline scroll-sync (AFTER the two pages) ===== */
+    .scroll-indicator { text-align: center; padding: 40px; color: white; font-size: 18px; animation: bounce 2s infinite; }
+    @keyframes bounce { 0%,20%,50%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-20px)} 60%{transform:translateY(-10px)} }
+    .timeline-section { position: relative; padding: 40px 0; }
+    .timeline-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: linear-gradient(180deg,#667eea 0%, #764ba2 100%); transform: translateX(-50%); }
+    .stage-card { position: relative; margin-bottom: 80px; opacity: 0; transform: translateY(50px); transition: all .6s ease-out; }
+    .stage-card.visible { opacity: 1; transform: translateY(0); }
+    .stage-card.active .timeline-dot { box-shadow: 0 0 0 12px rgba(102,126,234,.25); }
+    .stage-content-wrapper { background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,.15); display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; padding: 12px; gap: 12px; }
+    .stage-card:nth-child(even) .stage-content-wrapper { direction: rtl; }
+    .stage-card:nth-child(even) .info-panel, .stage-card:nth-child(even) .media-panel { direction: ltr; }
+    .timeline-dot { position: absolute; left: 50%; top: 50px; width: 30px; height: 30px; background: white; border: 5px solid #667eea; border-radius: 50%; transform: translateX(-50%); z-index: 10; box-shadow: 0 0 0 8px rgba(102,126,234,.2); }
+    .stage-card:nth-child(even) .timeline-dot { border-color: #764ba2; box-shadow: 0 0 0 8px rgba(118,75,162,.2); }
+    .media-panel { background: #000; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .media-panel iframe { width: 100%; height: 100%; border: none; }
+    .model-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg,#1a1a2e 0%, #16213e 100%); position: relative; color: #fff; text-align: center; padding: 40px; }
+    .model-icon { font-size: 100px; margin-bottom: 14px; animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+    .impact-badges-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    .impact-badge-lg { background: linear-gradient(135deg,#667eea 0%, #764ba2 100%); color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+    .stats-box { background: linear-gradient(135deg,#f5f7fa 0%, #c3cfe2 100%); padding: 16px; border-radius: 15px; margin-top: 14px; }
+    .stats-box h4 { color: #667eea; margin-bottom: 8px; font-size: 18px; }
+    .stats-box p { color: #555; font-size: 14px; margin: 4px 0; }
+
+    /* Responsive */
+    @media (max-width: 968px) {
+      .split-view { grid-template-columns: 1fr; }
+      .video-panel { min-height: 300px; }
+      .nav-links { gap: 15px; }
+      .materials-grid { grid-template-columns: 1fr; }
+      .timeline-line, .timeline-dot { left: 30px; transform: none; }
+      .stage-content-wrapper { grid-template-columns: 1fr !important; }
+      .media-panel { min-height: 300px; }
+      .info-panel, .media-panel { top: 90px; max-height: calc(100vh - 130px); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="logo">🏛️ Lịch Sử Vật Liệu</div>
+      <ul class="nav-links">
+        <li><a href="#" class="nav-link active" data-page="page1">Tổng Quan</a></li>
+        <li><a href="#" class="nav-link" data-page="page2">Chi Tiết Giai Đoạn</a></li>
+        <li><a href="#timeline" class="nav-link">Timeline Scroll</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="container">
+    <!-- PAGE 1: Giới thiệu -->
+    <div id="page1" class="page active">
+      <div class="intro-section">
+        <h1>Lịch Sử Phát Triển Vật Liệu & Tác Động Đến Kinh Tế</h1>
+        <p>Từ thời kỳ đồ đá cho đến kỷ nguyên công nghệ nano, sự phát triển của vật liệu đã định hình nên nền văn minh nhân loại và thúc đẩy sự tiến bộ kinh tế - xã hội.</p>
+      </div>
+      <div class="materials-grid">
+        <div class="material-card" data-open="page2" data-target="#stage2"> <h3>🪨 Thời Tiền Sử</h3> <div class="material-period">Trước 3000 TCN</div> <p><strong>Vật liệu:</strong> Đá, gỗ, xương</p> <p><strong>Ứng dụng:</strong> Công cụ thô sơ, vũ khí săn bắt, nhà ở</p> <p><strong>Tác động:</strong> Hình thành xã hội nguyên thủy</p> <span class="impact-badge">Nền tảng sinh tồn</span> </div>
+        <div class="material-card" data-open="page2" data-target="#stage2"> <h3>⚔️ Thời Đại Đồng - Sắt</h3> <div class="material-period">3000 - 500 TCN</div> <p><strong>Vật liệu:</strong> Đồng, đồng thau, sắt</p> <p><strong>Ứng dụng:</strong> Công cụ, vũ khí, nông cụ</p> <p><strong>Tác động:</strong> Nâng cao năng suất, đô thị cổ</p> <span class="impact-badge">Cách mạng nông nghiệp</span> </div>
+        <div class="material-card" data-open="page2" data-target="#stage3"> <h3>🏺 Thời Cổ - Trung Đại</h3> <div class="material-period">500 TCN - 1700</div> <p><strong>Vật liệu:</strong> Gốm, thuỷ tinh, thép rèn, vải</p> <p><strong>Ứng dụng:</strong> Xây dựng, trang sức, hàng hoá</p> <p><strong>Tác động:</strong> Giao thương quốc tế</p> <span class="impact-badge">Thương mại toàn cầu</span> </div>
+        <div class="material-card" data-open="page2" data-target="#stage4"> <h3>🏭 Cách Mạng Công Nghiệp</h3> <div class="material-period">1700 - 1900</div> <p><strong>Vật liệu:</strong> Thép, than, xi măng</p> <p><strong>Ứng dụng:</strong> Đường sắt, nhà máy, cầu cảng</p> <p><strong>Tác động:</strong> Bùng nổ công nghiệp</p> <span class="impact-badge">Cách mạng sản xuất</span> </div>
+        <div class="material-card" data-open="page2" data-target="#stage5"> <h3>🚗 Thế Kỷ XX</h3> <div class="material-period">1900 - 2000</div> <p><strong>Vật liệu:</strong> Nhôm, nhựa, cao su tổng hợp, silicon</p> <p><strong>Ứng dụng:</strong> Ô tô, điện tử, máy tính</p> <p><strong>Tác động:</strong> Công nghệ hóa</p> <span class="impact-badge">Kỷ nguyên công nghệ</span> </div>
+        <div class="material-card" data-open="page2" data-target="#stage6"> <h3>🔬 Thế Kỷ XXI - Hiện Nay</h3> <div class="material-period">2000 - Nay</div> <p><strong>Vật liệu:</strong> Nano, sinh học, composite, tái chế, lượng tử</p> <p><strong>Ứng dụng:</strong> Năng lượng sạch, y sinh, chip AI</p> <p><strong>Tác động:</strong> Kinh tế tri thức</p> <span class="impact-badge">Tương lai bền vững</span> </div>
+      </div>
+    </div>
+
+    <!-- PAGE 2: Chi tiết + video (tĩnh, chọn nút) -->
+    <div id="page2" class="page">
+      <div class="detail-container">
+        <div class="stage-selector">
+          <button class="stage-btn active" data-stage="stage1">Thời Tiền Sử</button>
+          <button class="stage-btn" data-stage="stage2">Đồng - Sắt</button>
+          <button class="stage-btn" data-stage="stage3">Cổ - Trung Đại</button>
+          <button class="stage-btn" data-stage="stage4">Cách Mạng CN</button>
+          <button class="stage-btn" data-stage="stage5">Thế Kỷ XX</button>
+          <button class="stage-btn" data-stage="stage6">Thế Kỷ XXI</button>
+        </div>
+        <div class="split-view">
+          <div class="info-panel">
+            <div class="stage-content active" id="stage1">
+              <h2>🪨 Thời Tiền Sử (Trước 3000 TCN)</h2>
+              <h3>Loại Vật Liệu Chủ Đạo</h3>
+              <ul><li><strong>Đá:</strong> Đá lửa, granit, vôi</li><li><strong>Gỗ:</strong> Gỗ cứng</li><li><strong>Xương:</strong> Dụng cụ sắc</li></ul>
+              <h3>Đặc Điểm & Ứng Dụng</h3>
+              <p>Công cụ đá cho săn bắn, chế biến; nền tảng sinh tồn và khởi đầu công nghệ.</p>
+              <ul><li>Rìu, dao đá</li><li>Mũi giáo, mũi tên</li><li>Hang động, lều tranh</li></ul>
+            </div>
+            <div class="stage-content" id="stage2">
+              <h2>⚔️ Thời Đại Đồng - Sắt (3000 - 500 TCN)</h2>
+              <h3>Vật Liệu</h3>
+              <ul><li><strong>Đồng</strong> • <strong>Đồng thau</strong> • <strong>Sắt</strong></li></ul>
+              <h3>Ảnh Hưởng</h3>
+              <p>Nông cụ kim loại tăng năng suất; thương mại mở rộng; đô thị cổ hình thành.</p>
+            </div>
+            <div class="stage-content" id="stage3">
+              <h2>🏺 Cổ Đại - Trung Đại (500 TCN - 1700)</h2>
+              <h3>Vật Liệu</h3>
+              <ul><li><strong>Gốm</strong> • <strong>Thuỷ tinh</strong> • <strong>Thép rèn</strong> • <strong>Vải</strong></li></ul>
+              <h3>Ảnh Hưởng</h3>
+              <p>Con đường Tơ lụa, thương nhân & thợ thủ công; giao thương toàn cầu sơ khai.</p>
+            </div>
+            <div class="stage-content" id="stage4">
+              <h2>🏭 Cách Mạng CN (1700 - 1900)</h2>
+              <h3>Vật Liệu</h3>
+              <ul><li><strong>Thép</strong> • <strong>Than</strong> • <strong>Xi măng</strong></li></ul>
+              <h3>Ảnh Hưởng</h3>
+              <p>Bùng nổ công nghiệp, đường sắt, đô thị hoá; năng suất tăng bậc thang.</p>
+            </div>
+            <div class="stage-content" id="stage5">
+              <h2>💻 Thế Kỷ XX (1900 - 2000)</h2>
+              <h3>Vật Liệu</h3>
+              <ul><li><strong>Nhôm</strong> • <strong>Nhựa</strong> • <strong>Cao su</strong> • <strong>Silicon</strong></li></ul>
+              <h3>Ảnh Hưởng</h3>
+              <p>Toàn cầu hóa, sản xuất hàng loạt, cách mạng số.</p>
+            </div>
+            <div class="stage-content" id="stage6">
+              <h2>🔬 Thế Kỷ XXI (2000 - Nay)</h2>
+              <h3>Vật Liệu</h3>
+              <ul><li><strong>Nano</strong> • <strong>Sinh học</strong> • <strong>Composite</strong> • <strong>Lượng tử</strong> • <strong>Tái chế</strong></li></ul>
+              <h3>Ảnh Hưởng</h3>
+              <p>Năng lượng sạch, y sinh, chip AI; phát triển bền vững.</p>
+            </div>
+          </div>
+          <div class="video-panel">
+            <iframe id="detailVideo" src="https://www.youtube.com/embed/e0fl-a3KZVI" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Timeline Scroll-Sync (from the second file) ===== -->
+    <section id="timeline" class="timeline-section">
+      <div class="timeline-line"></div>
+
+      <!-- Stage 1 -->
+      <div class="stage-card" data-stage="1">
+        <div class="timeline-dot"></div>
+        <div class="stage-content-wrapper">
+          <div class="info-panel">
+            <div class="stage-icon">🪨</div>
+            <span class="stage-period">Trước 3000 TCN</span>
+            <h2>Thời Tiền Sử</h2>
+            <h3>Loại Vật Liệu Chủ Đạo</h3>
+            <ul>
+              <li><strong>Đá:</strong> Đá lửa, đá granit, đá vôi dùng làm công cụ</li>
+              <li><strong>Gỗ:</strong> Gỗ cứng từ các loại cây rừng</li>
+              <li><strong>Xương:</strong> Xương động vật săn được làm công cụ sắc nhọn</li>
+            </ul>
+            <h3>Đặc Điểm & Ứng Dụng</h3>
+            <p>Công cụ đá được đập, mài để săn bắn, chế biến, xây dựng đơn sơ — nền tảng sinh tồn và khởi đầu công nghệ.</p>
+            <div class="impact-badges-row"><span class="impact-badge-lg">Nền tảng sinh tồn</span><span class="impact-badge-lg">Khởi đầu công nghệ</span></div>
+            <div class="stats-box"><h4>📊 Thống Kê</h4><p>• Công cụ đầu tiên: ~2.6 triệu năm trước</p><p>• Tuổi thọ trung bình: 25–30 tuổi</p></div>
+          </div>
+          <div class="media-panel"><iframe title="Tiền sử" data-src="https://www.youtube.com/embed/e0fl-a3KZVI"></iframe></div>
+        </div>
+      </div>
+
+      <!-- Stage 2 -->
+      <div class="stage-card" data-stage="2">
+        <div class="timeline-dot"></div>
+        <div class="stage-content-wrapper">
+          <div class="info-panel">
+            <div class="stage-icon">⚔️</div>
+            <span class="stage-period">3000 - 500 TCN</span>
+            <h2>Thời Đại Đồng - Sắt</h2>
+            <h3>Loại Vật Liệu Chủ Đạo</h3>
+            <ul>
+              <li><strong>Đồng:</strong> Kim loại đầu tiên được nấu luyện</li>
+              <li><strong>Đồng thau:</strong> Hợp kim đồng–thiếc, cứng hơn</li>
+              <li><strong>Sắt:</strong> Rộng rãi, rẻ, bền</li>
+            </ul>
+            <h3>Ảnh Hưởng</h3>
+            <p><strong>Năng suất nông nghiệp</strong> tăng mạnh; xuất hiện đô thị cổ, thương mại đường dài.</p>
+            <div class="impact-badges-row"><span class="impact-badge-lg">Cách mạng nông nghiệp</span><span class="impact-badge-lg">Đô thị hóa</span></div>
+          </div>
+          <div class="media-panel"><iframe title="Đồng - Sắt" data-src="https://www.youtube.com/embed/iVqjKpTvpM8"></iframe></div>
+        </div>
+      </div>
+
+      <!-- Stage 3 -->
+      <div class="stage-card" data-stage="3">
+        <div class="timeline-dot"></div>
+        <div class="stage-content-wrapper">
+          <div class="info-panel">
+            <div class="stage-icon">🏺</div>
+            <span class="stage-period">500 TCN - 1700</span>
+            <h2>Thời Cổ Đại - Trung Đại</h2>
+            <h3>Loại Vật Liệu Chủ Đạo</h3>
+            <ul><li><strong>Gốm sứ</strong> • <strong>Thuỷ tinh</strong> • <strong>Thép rèn</strong> • <strong>Vải</strong></li></ul>
+            <h3>Ảnh Hưởng</h3>
+            <p><strong>Con đường Tơ lụa</strong> thúc đẩy giao thương Đông–Tây; hình thành tầng lớp thương nhân và thợ thủ công.</p>
+            <div class="impact-badges-row"><span class="impact-badge-lg">Giao thương toàn cầu</span><span class="impact-badge-lg">Văn hóa – nghệ thuật</span></div>
+          </div>
+          <div class="media-panel"><iframe title="Cổ - Trung đại" data-src="https://www.youtube.com/embed/fhrUvIi1aGQ"></iframe></div>
+        </div>
+      </div>
+
+      <!-- Stage 4 -->
+      <div class="stage-card" data-stage="4">
+        <div class="timeline-dot"></div>
+        <div class="stage-content-wrapper">
+          <div class="info-panel">
+            <div class="stage-icon">🏭</div>
+            <span class="stage-period">1700 - 1900</span>
+            <h2>Cách Mạng Công Nghiệp</h2>
+            <h3>Vật Liệu</h3>
+            <ul><li><strong>Thép</strong> (Bessemer) • <strong>Than</strong> • <strong>Xi măng</strong></li></ul>
+            <h3>Ảnh Hưởng</h3>
+            <p><strong>Bùng nổ công nghiệp</strong>, đường sắt, cầu cảng; năng suất lao động tăng bậc thang; đô thị hóa mạnh.</p>
+            <div class="impact-badges-row"><span class="impact-badge-lg">GDP bùng nổ</span><span class="impact-badge-lg">Đô thị hóa</span></div>
+          </div>
+          <div class="media-panel"><iframe title="Cách mạng CN" data-src="https://www.youtube.com/embed/zhL5DCizj5c"></iframe></div>
+        </div>
+      </div>
+
+      <!-- Stage 5 -->
+      <div class="stage-card" data-stage="5">
+        <div class="timeline-dot"></div>
+        <div class="stage-content-wrapper">
+          <div class="info-panel">
+            <div class="stage-icon">💻</div>
+            <span class="stage-period">1900 - 2000</span>
+            <h2>Thế Kỷ XX - Kỷ Nguyên Công Nghệ</h2>
+            <h3>Vật Liệu</h3>
+            <ul><li><strong>Nhôm</strong> • <strong>Nhựa</strong> • <strong>Cao su tổng hợp</strong> • <strong>Silicon</strong></li></ul>
+            <h3>Ảnh Hưởng</h3>
+            <p><strong>Toàn cầu hóa</strong> và <strong>Cách mạng số</strong>; điện tử – viễn thông – máy tính bùng nổ.</p>
+            <div class="impact-badges-row"><span class="impact-badge-lg">Internet</span><span class="impact-badge-lg">Sản xuất hàng loạt</span></div>
+          </div>
+          <div class="media-panel"><iframe title="Thế kỷ XX" data-src="https://www.youtube.com/embed/yn9qhQSMCRk"></iframe></div>
+        </div>
+      </div>
+
+      <!-- Stage 6 -->
+      <div class="stage-card" data-stage="6">
+        <div class="timeline-dot"></div>
+        <div class="stage-content-wrapper">
+          <div class="info-panel">
+            <div class="stage-icon">🔬</div>
+            <span class="stage-period">2000 - Hiện Nay</span>
+            <h2>Thế Kỷ XXI - Tương Lai Bền Vững</h2>
+            <h3>Vật Liệu</h3>
+            <ul><li><strong>Vật liệu nano</strong> • <strong>Sinh học</strong> • <strong>Composite</strong> • <strong>Lượng tử</strong> • <strong>Tái chế</strong></li></ul>
+            <h3>Ảnh Hưởng</h3>
+            <p>Năng lượng sạch, y sinh, chip AI, sản xuất xanh — hướng tới <strong>kinh tế tri thức</strong> và <strong>phát triển bền vững</strong>.</p>
+            <div class="impact-badges-row"><span class="impact-badge-lg">AI & Bán dẫn</span><span class="impact-badge-lg">Công nghệ xanh</span></div>
+          </div>
+          <div class="media-panel"><iframe title="Thế kỷ XXI" data-src="https://www.youtube.com/embed/fmvNYOVwGYs"></iframe></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ===== Top nav: page switcher =====
+    const links = document.querySelectorAll('.nav-link[data-page]');
+    const pages = document.querySelectorAll('.page');
+    links.forEach((a) => a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const pid = a.getAttribute('data-page');
+      if (!pid) return;
+      pages.forEach(p => p.classList.remove('active'));
+      document.getElementById(pid).classList.add('active');
+      document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+      a.classList.add('active');
+    }));
+
+    // click material-card on page1 to jump to page2 and the respective stage
+    document.querySelectorAll('.material-card[data-open="page2"]').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelector('.nav-link[data-page="page2"]').click();
+        const target = card.getAttribute('data-target');
+        if (target) {
+          // switch stage button
+          const btn = document.querySelector(`.stage-btn[data-stage='${target.replace('#','').trim()}']`);
+          if (btn) btn.click();
+        }
+        document.getElementById('page2').scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    // ===== Page 2: tabbed stages + video swap =====
+    const videoMap = {
+      stage1: 'https://www.youtube.com/embed/e0fl-a3KZVI',
+      stage2: 'https://www.youtube.com/embed/iVqjKpTvpM8',
+      stage3: 'https://www.youtube.com/embed/fhrUvIi1aGQ',
+      stage4: 'https://www.youtube.com/embed/zhL5DCizj5c',
+      stage5: 'https://www.youtube.com/embed/yn9qhQSMCRk',
+      stage6: 'https://www.youtube.com/embed/fmvNYOVwGYs'
+    };
+    const stageBtns = document.querySelectorAll('.stage-btn');
+    const stageContents = document.querySelectorAll('.stage-content');
+    const detailVideo = document.getElementById('detailVideo');
+    stageBtns.forEach(btn => btn.addEventListener('click', () => {
+      stageBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const id = btn.dataset.stage;
+      stageContents.forEach(sc => sc.classList.toggle('active', sc.id === id));
+      if (videoMap[id]) detailVideo.src = videoMap[id] + '?autoplay=1&mute=1';
+    }));
+
+    // ===== Timeline: scroll-synced lazy video =====
+    const timelineSections = [document.getElementById('timeline')];
+    const stageCards = document.querySelectorAll('#timeline .stage-card');
+
+    function stopAllVideos(except) {
+      stageCards.forEach((card) => {
+        if (card === except) return;
+        const iframe = card.querySelector('.media-panel iframe');
+        if (iframe && iframe.src) {
+          iframe.dataset.src = iframe.src.replace(/\?autoplay=1&mute=1/, '');
+          iframe.src = '';
+        }
+      });
+    }
+
+    const stageObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const card = entry.target;
+          card.classList.add('visible', 'active');
+          stageCards.forEach((c) => c !== card && c.classList.remove('active'));
+          const iframe = card.querySelector('.media-panel iframe');
+          if (iframe) {
+            const want = iframe.dataset.src;
+            if (want && !iframe.src) {
+              iframe.src = want + (want.includes('?') ? '&' : '?') + 'autoplay=1&mute=1';
+            }
+          }
+          stopAllVideos(card);
+        }
+      });
+    }, { root: null, threshold: 0.6 });
+
+    stageCards.forEach((card) => stageObserver.observe(card));
+
+    // Optional keyboard nav for timeline
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+        const active = document.querySelector('#timeline .stage-card.active') || stageCards[0];
+        const next = active?.nextElementSibling?.classList.contains('stage-card') ? active.nextElementSibling : null;
+        if (next) next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        const active = document.querySelector('#timeline .stage-card.active') || stageCards[0];
+        const prev = active?.previousElementSibling?.classList.contains('stage-card') ? active.previousElementSibling : null;
+        if (prev) prev.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+    //khong biet noi gi hon
+  </script>
+</body>
+</html>
